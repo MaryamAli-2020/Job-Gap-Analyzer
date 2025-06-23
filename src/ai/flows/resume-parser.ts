@@ -1,0 +1,71 @@
+'use server';
+
+/**
+ * @fileOverview Resume parsing AI agent.
+ *
+ * - parseResume - A function that handles the resume parsing process.
+ * - ParseResumeInput - The input type for the parseResume function.
+ * - ParseResumeOutput - The return type for the parseResume function.
+ */
+
+import {ai} from '@/ai/genkit';
+import {z} from 'genkit';
+
+const ParseResumeInputSchema = z.object({
+  resumeDataUri: z
+    .string()
+    .describe(
+      "A resume file as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
+});
+export type ParseResumeInput = z.infer<typeof ParseResumeInputSchema>;
+
+const ParseResumeOutputSchema = z.object({
+  name: z.string().describe('The name of the resume owner.'),
+  email: z.string().describe('The email address of the resume owner.'),
+  phone: z.string().describe('The phone number of the resume owner.'),
+  skills: z.array(z.string()).describe('A list of skills extracted from the resume.'),
+  experience: z.array(z.string()).describe('A list of work experiences extracted from the resume.'),
+  education: z.array(z.string()).describe('A list of educational experiences extracted from the resume.'),
+});
+export type ParseResumeOutput = z.infer<typeof ParseResumeOutputSchema>;
+
+export async function parseResume(input: ParseResumeInput): Promise<ParseResumeOutput> {
+  return parseResumeFlow(input);
+}
+
+const prompt = ai.definePrompt({
+  name: 'parseResumePrompt',
+  input: {schema: ParseResumeInputSchema},
+  output: {schema: ParseResumeOutputSchema},
+  prompt: `You are an expert resume parser. Extract the following information from the resume text. If a particular piece of information cannot be found, return "".
+
+    Name: The name of the resume owner.
+    Email: The email address of the resume owner.
+    Phone: The phone number of the resume owner.
+    Skills: A list of skills extracted from the resume.
+    Experience: A list of work experiences extracted from the resume.
+    Education: A list of educational experiences extracted from the resume.
+
+    Here is the resume text:
+    {{resumeText}}`,
+});
+
+const parseResumeFlow = ai.defineFlow(
+  {
+    name: 'parseResumeFlow',
+    inputSchema: ParseResumeInputSchema,
+    outputSchema: ParseResumeOutputSchema,
+  },
+  async input => {
+    // Extract the resume text from the data URI.
+    const base64Resume = input.resumeDataUri.split(',')[1];
+    const resumeText = Buffer.from(base64Resume, 'base64').toString('utf-8');
+
+    const {output} = await prompt({
+      ...input,
+      resumeText,
+    });
+    return output!;
+  }
+);

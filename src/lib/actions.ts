@@ -18,21 +18,15 @@ export async function handleResumeUpload(resumeDataUri: string): Promise<ResumeD
   }
 }
 
-export async function getJobMatches(resumeData: ResumeData, jobListings: Job[]): Promise<Job[]> {
+export async function getJobMatches(resumeData: ResumeData): Promise<Job[]> {
   try {
     const resumeString = JSON.stringify(resumeData);
-    const listingsAsStrings = jobListings.map(job => 
-      `Title: ${job.title}, Company: ${job.company}, Description: ${job.description}`
-    );
 
-    const result = await jobMatcher({
+    const { matchedJobs } = await jobMatcher({
       resumeData: resumeString,
-      jobListings: listingsAsStrings,
     });
-
-    const relevantJobTitles = new Set(result.relevantJobTitles);
     
-    return jobListings.filter(job => relevantJobTitles.has(job.title));
+    return matchedJobs || [];
   } catch (error) {
     console.error('Error in getJobMatches:', error);
     throw new Error('Failed to match jobs.');

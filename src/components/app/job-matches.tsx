@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getJobMatches } from '@/lib/actions';
 import type { Job, ResumeData } from '@/lib/types';
-import { dummyJobs } from '@/lib/data';
 import { MapPin, Building, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,16 +23,16 @@ export default function JobMatches({ resumeData, onAnalyzeJob }: JobMatchesProps
     const fetchMatches = async () => {
       setIsLoading(true);
       try {
-        const result = await getJobMatches(resumeData, dummyJobs);
+        const result = await getJobMatches(resumeData);
         setMatchedJobs(result);
       } catch (error) {
         console.error('Error matching jobs:', error);
         toast({
           variant: 'destructive',
           title: 'Could not fetch job matches.',
-          description: 'Using all available listings as a fallback.',
+          description: 'There was an error finding relevant jobs. Please try again later.',
         });
-        setMatchedJobs(dummyJobs);
+        setMatchedJobs([]);
       } finally {
         setIsLoading(false);
       }
@@ -55,7 +54,7 @@ export default function JobMatches({ resumeData, onAnalyzeJob }: JobMatchesProps
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => <JobCardSkeleton key={i} />)
+          ? Array.from({ length: 5 }).map((_, i) => <JobCardSkeleton key={i} />)
           : matchedJobs.map((job) => (
               <JobCard key={job.id} job={job} onAnalyzeJob={onAnalyzeJob} />
             ))}

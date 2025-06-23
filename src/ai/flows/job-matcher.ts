@@ -9,17 +9,22 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { searchJobsTool } from '../tools/job-search';
 
 const JobMatcherInputSchema = z.object({
   resumeData: z.string().describe('The parsed data from the user\u2019s resume in JSON format.'),
-  jobListings: z.array(z.string()).describe('A list of job listings scraped from the web.'),
 });
 export type JobMatcherInput = z.infer<typeof JobMatcherInputSchema>;
 
 const JobMatcherOutputSchema = z.object({
-  relevantJobTitles: z
-    .array(z.string())
-    .describe("An array of job titles from the job listings that are most relevant to the user's resume."),
+  matchedJobs: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    company: z.string(),
+    location: z.string(),
+    description: z.string(),
+    url: z.string(),
+  })).describe("An array of job objects from the job listings that are most relevant to the user's resume."),
 });
 export type JobMatcherOutput = z.infer<typeof JobMatcherOutputSchema>;
 
@@ -31,17 +36,16 @@ const prompt = ai.definePrompt({
   name: 'jobMatcherPrompt',
   input: {schema: JobMatcherInputSchema},
   output: {schema: JobMatcherOutputSchema},
-  prompt: `You are an AI job matching expert. Compare the provided resume data with the list of job listings and identify the jobs that are most relevant to the user's skills and experience.
+  tools: [searchJobsTool],
+  prompt: `You are an AI job matching expert. Your goal is to find and recommend relevant jobs for a user based on their resume.
 
+First, analyze the user's resume to understand their key skills, experience, and potential job titles.
 Resume Data:
 {{{resumeData}}}
 
-Job Listings:
-{{#each jobListings}}
-- {{{this}}}
-{{/each}}
+Next, use the 'searchJobs' tool to find job listings. Construct a search query based on the most prominent skills and roles from the resume. For example, if the resume indicates skills in "React" and "TypeScript", a good query would be "React TypeScript developer".
 
-Based on the resume data, identify the top 5 most relevant jobs that match the candidate's experience and skills. Return an array of the titles of these 5 job listings in the \`relevantJobTitles\` field. If you cannot find 5 relevant jobs, return as many as you can find.
+Finally, from the jobs returned by the tool, identify the top 5 most relevant jobs that best match the candidate's experience and skills. Return an array of these 5 job objects in the \`matchedJobs\` field. If you cannot find 5 relevant jobs, return as many as you can find. Do not make up jobs; only use the ones from the tool.
 `,
 });
 

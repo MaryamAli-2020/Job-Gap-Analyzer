@@ -48,5 +48,29 @@ export const dummyJobs: Job[] = [
     location: 'Remote',
     description: 'We are hiring a DevOps Engineer to help us build functional systems that improve customer experience. DevOps Engineer responsibilities include deploying product updates, identifying production issues and implementing integrations. Experience with CI/CD pipelines, Kubernetes, Docker, and Terraform is essential.',
     url: '#',
+  },
+  {
+    id: '7',
+    title: 'Data Scientist',
+    company: 'QuantumLeap Analytics',
+    location: 'Chicago, IL',
+    description: 'We are seeking a Data Scientist to analyze large amounts of raw information to find patterns that will help improve our company. We rely on data scientists to build data products to extract valuable business insights. You should be highly analytical with a knack for analysis, math and statistics.',
+    url: '#',
+  },
+  {
+    id: '8',
+    title: 'Backend Engineer (Go)',
+    company: 'ScaleFast',
+    location: 'Remote',
+    description: 'ScaleFast is looking for a Backend Engineer with experience in Go (Golang) to help build and maintain our high-performance distributed systems. You will be working on a team of talented engineers to solve complex challenges in a fast-paced environment. Experience with microservices, gRPC, and Kubernetes is a must.',
+    url: '#',
+  },
+  {
+    id: '9',
+    title: 'Mobile Developer (React Native)',
+    company: 'Appify',
+    location: 'Los Angeles, CA',
+    description: 'Join our mobile team to build beautiful, high-performance applications for iOS and Android using React Native. The ideal candidate has a strong understanding of the React Native ecosystem and experience shipping production applications to the App Store and Google Play.',
+    url: '#',
   }
 ];

@@ -41,7 +41,8 @@ Job Listings:
 - {{{this}}}
 {{/each}}
 
-Based on the resume data, identify the jobs that match the candidate's experience and skills. Return *only an array of the titles* of the relevant job listings in the \`relevantJobTitles\` field.`,
+Based on the resume data, identify the top 5 most relevant jobs that match the candidate's experience and skills. Return an array of the titles of these 5 job listings in the \`relevantJobTitles\` field. If you cannot find 5 relevant jobs, return as many as you can find.
+`,
 });
 
 const jobMatcherFlow = ai.defineFlow(

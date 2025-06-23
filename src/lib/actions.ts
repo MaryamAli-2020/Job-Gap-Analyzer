@@ -30,13 +30,7 @@ export async function getJobMatches(resumeData: ResumeData, jobListings: Job[]):
       jobListings: listingsAsStrings,
     });
 
-    // Filter original jobs based on titles from relevant job listings
-    const relevantJobTitles = new Set(
-      result.relevantJobs.map(jobString => {
-        const match = jobString.match(/Title: (.*?)(, Company|, Description|$)/);
-        return match ? match[1].trim() : null;
-      }).filter(Boolean)
-    );
+    const relevantJobTitles = new Set(result.relevantJobTitles);
     
     return jobListings.filter(job => relevantJobTitles.has(job.title));
   } catch (error) {

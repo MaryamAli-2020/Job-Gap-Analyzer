@@ -38,17 +38,17 @@ const prompt = ai.definePrompt({
   name: 'parseResumePrompt',
   input: {schema: ParseResumeInputSchema},
   output: {schema: ParseResumeOutputSchema},
-  prompt: `You are an expert resume parser. Extract the following information from the resume text. If a particular piece of information cannot be found, return "".
+  prompt: `You are an expert resume parser. Extract the following information from the provided resume. If a particular piece of information cannot be found, return an empty string for that field or an empty list for list fields.
 
-    Name: The name of the resume owner.
-    Email: The email address of the resume owner.
-    Phone: The phone number of the resume owner.
-    Skills: A list of skills extracted from the resume.
-    Experience: A list of work experiences extracted from the resume.
-    Education: A list of educational experiences extracted from the resume.
+Resume: {{media url=resumeDataUri}}
 
-    Here is the resume text:
-    {{resumeText}}`,
+Extract the following:
+- Name: The name of the resume owner.
+- Email: The email address of the resume owner.
+- Phone: The phone number of the resume owner.
+- Skills: A list of skills from the resume.
+- Experience: A list of work experiences from the resume.
+- Education: A list of educational experiences from the resume.`,
 });
 
 const parseResumeFlow = ai.defineFlow(
@@ -58,14 +58,7 @@ const parseResumeFlow = ai.defineFlow(
     outputSchema: ParseResumeOutputSchema,
   },
   async input => {
-    // Extract the resume text from the data URI.
-    const base64Resume = input.resumeDataUri.split(',')[1];
-    const resumeText = Buffer.from(base64Resume, 'base64').toString('utf-8');
-
-    const {output} = await prompt({
-      ...input,
-      resumeText,
-    });
+    const {output} = await prompt(input);
     return output!;
   }
 );

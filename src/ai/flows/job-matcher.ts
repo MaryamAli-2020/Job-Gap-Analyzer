@@ -1,4 +1,3 @@
-// src/ai/flows/job-matcher.ts
 'use server';
 /**
  * @fileOverview A job matching AI agent.
@@ -12,15 +11,15 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const JobMatcherInputSchema = z.object({
-  resumeData: z.string().describe('The parsed data from the user\u2019s resume.'),
+  resumeData: z.string().describe('The parsed data from the user\u2019s resume in JSON format.'),
   jobListings: z.array(z.string()).describe('A list of job listings scraped from the web.'),
 });
 export type JobMatcherInput = z.infer<typeof JobMatcherInputSchema>;
 
 const JobMatcherOutputSchema = z.object({
-  relevantJobs: z
+  relevantJobTitles: z
     .array(z.string())
-    .describe('A list of job listings that are relevant to the user\u2019s resume.'),
+    .describe("An array of job titles from the job listings that are most relevant to the user's resume."),
 });
 export type JobMatcherOutput = z.infer<typeof JobMatcherOutputSchema>;
 
@@ -32,13 +31,17 @@ const prompt = ai.definePrompt({
   name: 'jobMatcherPrompt',
   input: {schema: JobMatcherInputSchema},
   output: {schema: JobMatcherOutputSchema},
-  prompt: `You are an AI job matching expert. Compare the provided resume data with the list of job listings and identify the jobs that are most relevant to the user's skills and experience.\
+  prompt: `You are an AI job matching expert. Compare the provided resume data with the list of job listings and identify the jobs that are most relevant to the user's skills and experience.
 
-Resume Data: {{{resumeData}}}
-Job Listings: {{#each jobListings}}{{{this}}}\n{{/each}}
+Resume Data:
+{{{resumeData}}}
 
-Based on the resume data, identify the jobs that match the candidate's experience and skills. Return only a list of the relevant job listings.
-`,
+Job Listings:
+{{#each jobListings}}
+- {{{this}}}
+{{/each}}
+
+Based on the resume data, identify the jobs that match the candidate's experience and skills. Return *only an array of the titles* of the relevant job listings in the \`relevantJobTitles\` field.`,
 });
 
 const jobMatcherFlow = ai.defineFlow(

@@ -2,8 +2,8 @@
 
 Career Compass is a modern web application built with Next.js and powered by Google's Gemini AI. It helps you navigate your career path by analyzing your resume, matching you with relevant job opportunities, identifying skill gaps against job descriptions, and recommending personalized learning resources to help you land your dream job.
 
-![Career Compass Screenshot](https://placehold.co/800x450.png?text=Career+Compass+UI)
-*This is a placeholder image. A real screenshot of the application should be placed here.*
+![Career Compass Screenshot](https://i.imgur.com/FmADJaq.png)
+
 
 ## ✨ Features
 

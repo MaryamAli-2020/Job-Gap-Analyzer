@@ -55,22 +55,21 @@ const prompt = ai.definePrompt({
   name: 'skillGapAnalyzerPrompt',
   input: {schema: SkillGapAnalyzerInputSchema},
   output: {schema: SkillGapAnalyzerOutputSchema},
-  prompt: `You are a career advisor that can analyze the differences between a user's skills and the requirements of their target jobs and pinpoint the skill gaps.
+  prompt: `You are an expert career advisor. Your task is to perform a detailed skill gap analysis by comparing the user's resume against a target job description.
 
-  Analyze the resume and job description to find the missing skills, matched skills and suggest additional skills.
+  **Resume Content:**
+  {{{resumeText}}}
 
-  Resume:
-  {{resumeText}}
+  **Target Job Description:**
+  {{{jobDescription}}}
 
-  Job Description:
-  {{jobDescription}}
+  **Analysis Instructions:**
+  1.  **Matched Skills**: Identify skills that are explicitly mentioned in both the resume and the job description. Be liberal and consider synonyms or related technologies (e.g., "React" in resume matches "React.js" in job description).
+  2.  **Missing Skills**: Identify key skills required by the job description that are NOT found anywhere in the resume. Be strict and focus on the explicit requirements of the job.
+  3.  **Suggested Skills**: Analyze the user's experience in the resume and identify relevant skills that they likely possess but haven't listed explicitly. These should be skills that would strengthen their application for this specific job. For example, if they list "React" and "Node.js", you might suggest they highlight "full-stack development".
+  4.  **Gap Analysis Summary**: Write a brief, encouraging summary of the analysis. Highlight the user's strengths and provide actionable advice on how to bridge the skill gaps for this specific role.
 
-  Output the missingSkills, matchedSkills, suggestedSkills, and gapAnalysisSummary fields.
-  Use the job description as the source of truth.
-  Consider synonyms for skills.
-  For suggestedSkills, make sure the skills can be extracted from the resume.
-  Do not include skills from the same domain in the missingSkills and suggestedSkills.
-  Be strict with the job description to extract the missingSkills.
+  Please provide the output in the specified JSON format.
 `,
 });
 

@@ -21,12 +21,24 @@ const ParseResumeInputSchema = z.object({
 export type ParseResumeInput = z.infer<typeof ParseResumeInputSchema>;
 
 const ParseResumeOutputSchema = z.object({
-  name: z.string().describe('The name of the resume owner.'),
-  email: z.string().describe('The email address of the resume owner.'),
-  phone: z.string().describe('The phone number of the resume owner.'),
-  skills: z.array(z.string()).describe('A list of skills extracted from the resume.'),
-  experience: z.array(z.string()).describe('A list of work experiences extracted from the resume.'),
-  education: z.array(z.string()).describe('A list of educational experiences extracted from the resume.'),
+  name: z.string().describe('The full name of the candidate.'),
+  email: z.string().describe('The primary email address of the candidate.'),
+  phone: z.string().describe('The primary phone number of the candidate.'),
+  skills: z
+    .array(z.string())
+    .describe(
+      'A list of key technical and soft skills. Infer from the entire document, not just a dedicated skills section.'
+    ),
+  experience: z
+    .array(z.string())
+    .describe(
+      'A list of professional work experiences. Each item should be a concise summary of a role, including company, title, and duration if available.'
+    ),
+  education: z
+    .array(z.string())
+    .describe(
+      'A list of educational qualifications. Each item should include the degree, institution, and graduation year if available.'
+    ),
 });
 export type ParseResumeOutput = z.infer<typeof ParseResumeOutputSchema>;
 
@@ -38,17 +50,22 @@ const prompt = ai.definePrompt({
   name: 'parseResumePrompt',
   input: {schema: ParseResumeInputSchema},
   output: {schema: ParseResumeOutputSchema},
-  prompt: `You are an expert resume parser. Extract the following information from the provided resume. If a particular piece of information cannot be found, return an empty string for that field or an empty list for list fields.
+  prompt: `You are an expert resume parser. Your task is to meticulously analyze the provided resume document and extract key information into a structured JSON format. The resume may come in various layouts, so be flexible in identifying sections.
 
-Resume: {{media url=resumeDataUri}}
+Resume Document:
+{{media url=resumeDataUri}}
 
-Extract the following:
-- Name: The name of the resume owner.
-- Email: The email address of the resume owner.
-- Phone: The phone number of the resume owner.
-- Skills: A list of skills from the resume.
-- Experience: A list of work experiences from the resume.
-- Education: A list of educational experiences from the resume.`,
+Please extract the following details:
+
+1.  **Name**: Identify the full name of the candidate.
+2.  **Email**: Find the primary email address.
+3.  **Phone**: Find the primary contact phone number.
+4.  **Skills**: Compile a comprehensive list of skills. Look for a dedicated "Skills" section, but also infer skills from the "Experience" and "Projects" sections.
+5.  **Experience**: Extract each distinct work experience. Summarize each entry into a single string, including the job title, company name, and employment dates if available.
+6.  **Education**: Extract all educational qualifications. Summarize each entry into a single string, including the degree, university/institution, and graduation date if available.
+
+If a specific piece of information (like a phone number) is not present, return an empty string for that field. For lists like skills, experience, or education, return an empty array if no relevant information is found.
+`,
 });
 
 const parseResumeFlow = ai.defineFlow(

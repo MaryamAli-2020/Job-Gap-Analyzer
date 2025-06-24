@@ -133,7 +133,7 @@ export default function SkillGapAnalysisDialog({
           <DialogTitle className="font-headline text-2xl">
             Skill Gap Analysis for <span className="text-primary">{job?.title}</span>
           </DialogTitle>
-          <DialogDescription>Comparing your resume with the job requirements at {job?.company}.</DialogDescription>
+          <DialogDescription>Comparing your resume with the job requirements.</DialogDescription>
         </DialogHeader>
         {renderContent()}
       </DialogContent>

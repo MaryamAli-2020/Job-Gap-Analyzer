@@ -20,8 +20,6 @@ const JobMatcherOutputSchema = z.object({
   matchedJobs: z.array(z.object({
     id: z.string(),
     title: z.string(),
-    company: z.string(),
-    location: z.string(),
     description: z.string(),
     url: z.string(),
   })).describe("An array of job objects from the job listings that are most relevant to the user's resume."),

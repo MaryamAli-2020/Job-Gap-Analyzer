@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getJobMatches } from '@/lib/actions';
 import type { Job, ResumeData } from '@/lib/types';
-import { MapPin, Building, Sparkles } from 'lucide-react';
+import { Sparkles, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface JobMatchesProps {
@@ -73,15 +73,16 @@ const JobCard = ({ job, onAnalyzeJob }: { job: Job, onAnalyzeJob: (job: Job) => 
   <Card className="hover:shadow-lg transition-shadow">
     <CardHeader>
       <CardTitle>{job.title}</CardTitle>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground pt-1">
-        <p className="flex items-center gap-1.5"><Building className="h-4 w-4" /> {job.company}</p>
-        <p className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {job.location}</p>
-      </div>
     </CardHeader>
     <CardContent>
       <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
     </CardContent>
-    <CardFooter className="flex justify-end">
+    <CardFooter className="flex justify-end gap-2">
+        <Button variant="outline" asChild>
+            <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                View Job <ExternalLink className="h-4 w-4" />
+            </a>
+        </Button>
         <Button onClick={() => onAnalyzeJob(job)} className="bg-accent hover:bg-accent/90 text-accent-foreground">Analyze Skill Gap</Button>
     </CardFooter>
   </Card>
@@ -91,16 +92,13 @@ const JobCardSkeleton = () => (
     <Card>
         <CardHeader>
             <Skeleton className="h-6 w-3/4 rounded-md" />
-            <div className="flex gap-4 pt-2">
-                <Skeleton className="h-4 w-1/4 rounded-md" />
-                <Skeleton className="h-4 w-1/4 rounded-md" />
-            </div>
         </CardHeader>
         <CardContent>
             <Skeleton className="h-4 w-full rounded-md" />
             <Skeleton className="h-4 w-2/3 rounded-md mt-2" />
         </CardContent>
-        <CardFooter className="flex justify-end">
+        <CardFooter className="flex justify-end gap-2">
+            <Skeleton className="h-10 w-28 rounded-md" />
             <Skeleton className="h-10 w-36 rounded-md" />
         </CardFooter>
     </Card>

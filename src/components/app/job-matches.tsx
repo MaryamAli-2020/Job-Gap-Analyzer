@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getJobMatches } from '@/lib/actions';
 import type { Job, ResumeData } from '@/lib/types';
-import { Sparkles, ExternalLink } from 'lucide-react';
+import { Sparkles, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface JobMatchesProps {
@@ -19,38 +19,44 @@ export default function JobMatches({ resumeData, onAnalyzeJob }: JobMatchesProps
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchMatches = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getJobMatches(resumeData);
-        setMatchedJobs(result);
-      } catch (error) {
-        console.error('Error matching jobs:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Could not fetch job matches.',
-          description: 'There was an error finding relevant jobs. Please try again later.',
-        });
-        setMatchedJobs([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMatches();
+  const fetchMatches = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await getJobMatches(resumeData);
+      setMatchedJobs(result);
+    } catch (error) {
+      console.error('Error matching jobs:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Could not fetch job matches.',
+        description: 'There was an error finding relevant jobs. Please try again later.',
+      });
+      setMatchedJobs([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [resumeData, toast]);
+
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
 
   return (
     <Card className="shadow-md">
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl flex items-center gap-3">
-          <Sparkles className="h-6 w-6 text-primary" />
-          Recommended Job Openings
-        </CardTitle>
-        <CardDescription>
-          Based on your resume, we found these opportunities for you.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div>
+            <CardTitle className="font-headline text-2xl flex items-center gap-3">
+              <Sparkles className="h-6 w-6 text-primary" />
+              Recommended Job Openings
+            </CardTitle>
+            <CardDescription>
+              Based on your resume, we found these opportunities for you.
+            </CardDescription>
+        </div>
+        <Button variant="ghost" size="icon" onClick={fetchMatches} disabled={isLoading}>
+          <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
+          <span className="sr-only">Refresh job recommendations</span>
+        </Button>
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading
@@ -78,11 +84,6 @@ const JobCard = ({ job, onAnalyzeJob }: { job: Job, onAnalyzeJob: (job: Job) => 
       <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
     </CardContent>
     <CardFooter className="flex justify-end gap-2">
-        <Button variant="outline" asChild>
-            <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                View Job <ExternalLink className="h-4 w-4" />
-            </a>
-        </Button>
         <Button onClick={() => onAnalyzeJob(job)} className="bg-accent hover:bg-accent/90 text-accent-foreground">Analyze Skill Gap</Button>
     </CardFooter>
   </Card>
@@ -98,7 +99,6 @@ const JobCardSkeleton = () => (
             <Skeleton className="h-4 w-2/3 rounded-md mt-2" />
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
-            <Skeleton className="h-10 w-28 rounded-md" />
             <Skeleton className="h-10 w-36 rounded-md" />
         </CardFooter>
     </Card>

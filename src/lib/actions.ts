@@ -2,8 +2,7 @@
 
 import { parseResume } from '@/ai/flows/resume-parser';
 import { jobMatcher } from '@/ai/flows/job-matcher';
-import { analyzeSkillGaps } from '@/ai/flows/skill-gap-analyzer';
-import { recommendResources } from '@/ai/flows/resource-recommender';
+import { analyzeGapsAndRecommendResources } from '@/ai/flows/skill-gap-analyzer';
 import type { ResumeData, Job, AnalysisData } from '@/lib/types';
 
 export async function handleResumeUpload(resumeDataUri: string): Promise<ResumeData> {
@@ -39,19 +38,13 @@ export async function getSkillGapAnalysisAndResources(
   desiredJob: string
 ): Promise<AnalysisData> {
   try {
-    const skillGapPromise = analyzeSkillGaps({ resumeText, jobDescription });
-    
-    const skillGap = await skillGapPromise;
-    
-    const resourcesPromise = recommendResources({
-      skillGaps: skillGap.gapAnalysisSummary,
-      desiredJob: desiredJob,
+    const analysisAndResources = await analyzeGapsAndRecommendResources({
+      resumeText,
+      jobDescription,
+      desiredJob,
     });
 
-    const resources = await resourcesPromise;
-
-    return { skillGap, resources };
-
+    return analysisAndResources;
   } catch (error) {
     console.error('Error in getSkillGapAnalysisAndResources:', error);
     throw new Error('Failed to analyze skill gap and recommend resources.');

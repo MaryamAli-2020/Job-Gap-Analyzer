@@ -50,7 +50,7 @@ const prompt = ai.definePrompt({
   name: 'parseResumePrompt',
   input: {schema: ParseResumeInputSchema},
   output: {schema: ParseResumeOutputSchema},
-  prompt: `You are an expert resume parser. Your task is to meticulously analyze the provided resume document and extract key information into a structured JSON format. The resume may come in various layouts, so be flexible in identifying sections.
+  prompt: `You are an expert resume parser. Your task is to meticulously analyze the provided resume document and extract key information into a structured JSON format. The resume may come in various layouts, so be flexible in identifying sections. It is critical to extract as much information as possible, even if it's not explicitly labeled.
 
 Resume Document:
 {{media url=resumeDataUri}}
@@ -60,8 +60,10 @@ Please extract the following details:
 1.  **Name**: Identify the full name of the candidate.
 2.  **Email**: Find the primary email address.
 3.  **Phone**: Find the primary contact phone number.
-4.  **Skills**: Compile a comprehensive list of skills. Look for a dedicated "Skills" section, but also infer skills from the "Experience" and "Projects" sections.
-5.  **Experience**: Extract each distinct work experience. Summarize each entry into a single string, including the job title, company name, and employment dates if available.
+4.  **Skills**: This is the most important section. Compile a comprehensive list of skills.
+    *   First, look for a dedicated "Skills" section.
+    *   Then, **thoroughly infer skills** from the "Experience" and "Projects" sections. For example, if a job description mentions "developed a REST API with Node.js", you should extract "REST API", "API Development", and "Node.js" as skills. Be exhaustive.
+5.  **Experience**: Extract each distinct work experience. Summarize each entry into a single string, including the job title, company name, and employment dates if available. Make sure to capture the core responsibilities.
 6.  **Education**: Extract all educational qualifications. Summarize each entry into a single string, including the degree, university/institution, and graduation date if available.
 
 If a specific piece of information (like a phone number) is not present, return an empty string for that field. For lists like skills, experience, or education, return an empty array if no relevant information is found.
